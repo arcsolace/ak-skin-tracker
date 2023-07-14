@@ -169,3 +169,78 @@ func CreateUser(c *f.Ctx) error {
         "user_code":  userCode,
     })
 }
+
+func RemoveUserSkins(c *f.Ctx) error {
+    userCol := config.MI.DB.Collection("users")
+    ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+    defer cancel()
+
+    userCode := c.Params("user_code")
+    var req struct {
+        SkinIDs []int `json:"skin_ids"`
+    }
+    if err := c.BodyParser(&req); err != nil {
+        return c.Status(f.StatusBadRequest).JSON(f.Map{
+            "success": false,
+            "message": "Invalid request body!",
+        })
+    }
+
+    filter := bson.M{"user_code": userCode}
+
+    update := bson.M{
+        "$pullAll": bson.M{"skins": req.SkinIDs},
+    }
+
+    updateResult, err := userCol.UpdateOne(ctx, filter, update)
+    if err != nil {
+        return c.Status(f.StatusInternalServerError).JSON(f.Map{
+            "success": false,
+            "message": "Error removing user skins!",
+            "error":   err.Error(),
+        })
+    }
+
+    if updateResult.MatchedCount == 0 {
+        return c.Status(f.StatusNotFound).JSON(f.Map{
+            "success": false,
+            "message": "User not found!",
+        })
+    }
+
+    return c.Status(f.StatusOK).JSON(f.Map{
+        "success": true,
+        "message": "User skins removed successfully!",
+    })
+}
+
+func DeleteUser(c *f.Ctx) error {
+    userCol := config.MI.DB.Collection("users")
+    ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+    defer cancel()
+
+    userCode := c.Params("user_code")
+
+    filter := bson.M{"user_code": userCode}
+
+    deleteResult, err := userCol.DeleteOne(ctx, filter)
+    if err != nil {
+        return c.Status(f.StatusInternalServerError).JSON(f.Map{
+            "success": false,
+            "message": "Error deleting user!",
+            "error":   err.Error(),
+        })
+    }
+
+    if deleteResult.DeletedCount == 0 {
+        return c.Status(f.StatusNotFound).JSON(f.Map{
+            "success": false,
+            "message": "User not found!",
+        })
+    }
+
+    return c.Status(f.StatusOK).JSON(f.Map{
+        "success": true,
+        "message": "User deleted successfully!",
+    })
+}
