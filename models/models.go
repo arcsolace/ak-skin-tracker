@@ -21,6 +21,7 @@ type SharedUser struct {
 
 type SkinBrief struct {
 	ID		    primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Character	string			   `json:"chara,omitempty" bson:"chara,omitempty"`
 	SkinId		int				   `json:"skin_id,omitempty" bson:"skin_id,omitempty"`
 	Skin		string			   `json:"skin,omitempty" bson:"skin,omitempty"`
 	Brand		int				   `json:"brand,omitempty" bson:"brand,omitempty"`
@@ -33,6 +34,7 @@ type SkinBrief struct {
 
 type Skin struct {
 	ID		    primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Character	string			   `json:"chara,omitempty" bson:"chara,omitempty"`
 	SkinId		int				   `json:"skin_id,omitempty" bson:"skin_id,omitempty"`
 	Skin		string			   `json:"skin,omitempty" bson:"skin,omitempty"`
 	Brand		int				   `json:"brand,omitempty" bson:"brand,omitempty"`
