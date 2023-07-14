@@ -16,7 +16,7 @@ import (
     "go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetAllSkins(c *f.Ctx) error {
+func getAllSkins(c *f.Ctx) error {
 	skinCol := config.MI.DB.Collection("skins")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
@@ -32,7 +32,7 @@ func GetAllSkins(c *f.Ctx) error {
 		return c.Status(f.StatusNotFound).JSON(f.Map{
 			"success":  false,
 			"message":  "No skins found!",
-			"error": 	err,
+			"error" : err,
 		})
 	}
 
@@ -47,5 +47,27 @@ func GetAllSkins(c *f.Ctx) error {
 	return c.Status(f.StatusOK).JSON(f.Map{
 		"data":	skins,
 		"total": len(skins),
+	})
+}
+
+func getSkinByID(c *f.Ctx) error {
+	skinCol := config.MI.DB.Collection("skins")
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	var result m.Skin
+
+	filter := bson.M{"id": c.Params("id")}
+	err := skinCol.FindOne(ctx, filter).Decode(&result)
+
+	if err != nil {
+		return c.Status(f.StatusBadRequest).JSON(f.Map{
+			"success": false,
+			"message": "Error retrieving skin!",
+			"error": err,
+		})
+	}
+
+	return c.Status(f.StatusOK).JSON(f.Map{
+		"data": result,
 	})
 }
