@@ -101,7 +101,7 @@ func CreateUser(c *f.Ctx) error {
     }
 
     userCode := u.GenerateRandomUserCode(6)
-    newUser := User{
+    newUser := m.User{
         UserCode: userCode,
         UserName: req.UserName,
         Skins:    []int{},
@@ -117,8 +117,8 @@ func CreateUser(c *f.Ctx) error {
     }
 
     return c.Status(f.StatusOK).JSON(f.Map{
-        "success":   true,
-        "message":   "User created successfully!",
-        "user_code": userCode,
+        "success":    true,
+        "message":    "User created successfully!",
+        "user_code":  userCode,
     })
 }
