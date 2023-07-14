@@ -7,7 +7,7 @@ import (
     // "math"
     "strconv"
     "time"
-	"encoding/json"
+	// "encoding/json"
 
     f "github.com/gofiber/fiber/v2"
     "github.com/arcsolace/ak-skin-tracker/config"
@@ -88,105 +88,6 @@ func GetSkinByID(c *f.Ctx) error {
 	return c.Status(f.StatusOK).JSON(f.Map{
 		"success": true,
 		"data":    result,
-	})
-}
-
-func GetMultipleSkinsByIDs(c *f.Ctx) error {
-	skinCol := config.MI.DB.Collection("skins")
-	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
-	defer cancel()
-
-	skinIDsRaw := c.Query("skin_id")
-	var skinIDs []int
-
-	err := json.Unmarshal([]byte(skinIDsRaw), &skinIDs)
-	if err != nil {
-		return c.Status(f.StatusNotFound).JSON(f.Map{
-			"success": false,
-			"message": "Invalid skin IDs!",
-		})
-	}
-
-	filter := bson.M{"skin_id": bson.M{"$in": skinIDs}}
-	cursor, err := skinCol.Find(ctx, filter)
-	if err != nil {
-		return c.Status(f.StatusInternalServerError).JSON(f.Map{
-			"success": false,
-			"message": "Error retrieving skins!",
-			"error":   err.Error(),
-		})
-	}
-	defer cursor.Close(ctx)
-
-	var results []m.Skin
-	for cursor.Next(ctx) {
-		var result m.Skin
-		if err := cursor.Decode(&result); err != nil {
-			return c.Status(f.StatusInternalServerError).JSON(f.Map{
-				"success": false,
-				"message": "Error decoding skin!",
-				"error":   err.Error(),
-			})
-		}
-		results = append(results, result)
-	}
-
-	if err := cursor.Err(); err != nil {
-		return c.Status(f.StatusInternalServerError).JSON(f.Map{
-			"success": false,
-			"message": "Error iterating over skins!",
-			"error":   err.Error(),
-		})
-	}
-
-	return c.Status(f.StatusOK).JSON(f.Map{
-		"success": true,
-		"data":    results,
-	})
-}
-
-func UpdateUserSkins(c *f.Ctx) error {
-	userCol := config.MI.DB.Collection("users")
-	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
-	defer cancel()
-
-	userCode := c.Params("user_code")
-
-	var req struct {
-		SkinIDs []int `json:"skin_ids"`
-	}
-
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(f.StatusBadRequest).JSON(f.Map{
-			"success": false,
-			"message": "Invalid request body!",
-		})
-	}
-
-	filter := bson.M{"user_code": userCode}
-	update := bson.M{
-		"$addToSet": bson.M{"skins": bson.M{"$each": req.SkinIDs}},
-	}
-
-	updateResult, err := userCol.UpdateOne(ctx, filter, update)
-	if err != nil {
-		return c.Status(f.StatusInternalServerError).JSON(f.Map{
-			"success": false,
-			"message": "Error updating user skins!",
-			"error":   err.Error(),
-		})
-	}
-
-	if updateResult.MatchedCount == 0 {
-		return c.Status(f.StatusNotFound).JSON(f.Map{
-			"success": false,
-			"message": "User not found!",
-		})
-	}
-
-	return c.Status(f.StatusOK).JSON(f.Map{
-		"success": true,
-		"message": "User skins updated successfully!",
 	})
 }
 
