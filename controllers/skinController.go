@@ -21,7 +21,10 @@ func GetAllSkins(c *f.Ctx) error {
 
 	var skins []m.SkinBrief
 
-	cursor, err := skinCol.Find(ctx)
+	filter := bson.M{}
+    findOptions := options.Find()
+
+	cursor, err := skinCol.Find(ctx, filter, findOptions)
 	defer cursor.Close(ctx)
 
 	if err != nil {
@@ -40,6 +43,6 @@ func GetAllSkins(c *f.Ctx) error {
 
 	return c.Status(f.StatusOK).JSON(f.Map{
 		"data":	skins,
-		"total": len(skins)
+		"total": len(skins),
 	})
 }

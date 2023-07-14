@@ -1,4 +1,4 @@
-module ak-skin-tracker
+module github.com/arcsolace/ak-skin-tracker
 
 go 1.17
 
