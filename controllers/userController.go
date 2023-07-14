@@ -145,11 +145,13 @@ func CreateUser(c *f.Ctx) error {
         })
     }
 
-    userCode := u.GenerateRandomUserCode(6)
+    userCode := u.GenerateRandomUserCode(8)
+	shareCode := u.GenerateRandomUserCode(10)
     newUser := m.User{
         UserCode: userCode,
         UserName: req.UserName,
         Skins:    []int{},
+		ShareCode: shareCode,
     }
 
     _, err := userCol.InsertOne(ctx, newUser)
