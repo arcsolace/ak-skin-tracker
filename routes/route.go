@@ -6,6 +6,6 @@ import (
 )
 
 func SkinsRoute(r f.Router) {
-    r.Get("/", c.getAllSkins)
-	r.Get("/:id", c.getSkinByID)
+    r.Get("/", c.GetAllSkins)
+	r.Get("/:id", c.GetSkinByID)
 }
