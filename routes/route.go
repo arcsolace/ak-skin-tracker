@@ -9,3 +9,7 @@ func SkinsRoute(r f.Router) {
     r.Get("/", c.GetAllSkins)
 	r.Get("/:id", c.GetSkinByID)
 }
+
+func UserRoute(r f.Router) {
+	r.Get("/:user_code", c.GetUserSkins)
+}
