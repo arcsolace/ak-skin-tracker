@@ -2,6 +2,7 @@ package controllers
 
 import (
     "context"
+	// "fmt"
     // "log"
     // "math"
     // "strconv"
@@ -12,21 +13,20 @@ import (
     m "github.com/arcsolace/ak-skin-tracker/models"
     "go.mongodb.org/mongo-driver/bson"
     // "go.mongodb.org/mongo-driver/bson/primitive"
-    // "go.mongodb.org/mongo-driver/mongo/options"
+    "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func GetAllSkins(c *f.Ctx) error {
 	skinCol := config.MI.DB.Collection("skins")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	var skins []m.SkinBrief
+	var skins []m.Skin
 
 	filter := bson.M{}
-	sort := bson.D{{"rarity", 0}}
+	sort := bson.D{{"rarity", -1}}
 	opts := options.Find().SetSort(sort)
 
-	cursor, err := skinCol.Find(ctx, filter)
-	defer cursor.Close(ctx)
+	cursor, err := skinCol.Find(ctx, filter, opts)
 
 	if err != nil {
 		return c.Status(f.StatusNotFound).JSON(f.Map{
@@ -37,10 +37,12 @@ func GetAllSkins(c *f.Ctx) error {
 	}
 
 	for cursor.Next(ctx) {
-		var skin m.SkinBrief
+		var skin m.Skin
 		cursor.Decode(&skin)
 		skins = append(skins, skin)
 	}
+
+	defer cursor.Close(ctx)
 
 	return c.Status(f.StatusOK).JSON(f.Map{
 		"data":	skins,
