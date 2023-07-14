@@ -2,17 +2,17 @@ package controllers
 
 import (
     "context"
-    "log"
-    "math"
-    "strconv"
+    // "log"
+    // "math"
+    // "strconv"
     "time"
 
     f "github.com/gofiber/fiber/v2"
     "github.com/arcsolace/ak-skin-tracker/config"
     m "github.com/arcsolace/ak-skin-tracker/models"
     "go.mongodb.org/mongo-driver/bson"
-    "go.mongodb.org/mongo-driver/bson/primitive"
-    "go.mongodb.org/mongo-driver/mongo/options"
+    // "go.mongodb.org/mongo-driver/bson/primitive"
+    // "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func GetAllSkins(c *f.Ctx) error {
@@ -22,9 +22,10 @@ func GetAllSkins(c *f.Ctx) error {
 	var skins []m.SkinBrief
 
 	filter := bson.M{}
-    findOptions := options.Find()
+	sort := bson.D{{"rarity", 0}}
+	opts := options.Find().SetSort(sort)
 
-	cursor, err := skinCol.Find(ctx, filter, findOptions)
+	cursor, err := skinCol.Find(ctx, filter)
 	defer cursor.Close(ctx)
 
 	if err != nil {
