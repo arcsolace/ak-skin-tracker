@@ -1,13 +1,53 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+    "log"
+    "os"
 
-func main() {
-    app := fiber.New()
+    f "github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v2/middleware/cors"
+    "github.com/gofiber/fiber/v2/middleware/logger"
+    "github.com/joho/godotenv"
+    "github.com/arcsolace/ak-skin-tracker/config"
+    r "github.com/arcsolace/ak-skin-tracker/routes"
+)
 
-    app.Get("/", func(c *fiber.Ctx) error {
-        return c.SendString("Hello, World!")
+func setupRoutes(app *f.App) {
+    app.Get("/", func(c *f.Ctx) error {
+        return c.Status(f.StatusOK).JSON(f.Map{
+            "success":     true,
+            "message":     "Hello, World!",
+            "github_repo": "<https://github.com/arcsolace/ak-skin-tracker>",
+        })
     })
 
-    app.Listen(":3000")
+    api := app.Group("/api")
+
+    r.SkinsRoute(api.Group("/skin"))
+}
+
+func main() {
+    if os.Getenv("APP_ENV") != "production" {
+        err := godotenv.Load()
+        if err != nil {
+            log.Fatal("Error loading .env file")
+        }
+    }
+
+    app := f.New()
+
+    app.Use(cors.New())
+    app.Use(logger.New())
+
+    config.ConnectDB()
+
+    setupRoutes(app)
+
+    port := os.Getenv("PORT")
+    err := app.Listen(":" + port)
+
+    if err != nil {
+        log.Fatal("Error app failed to start")
+        panic(err)
+    }
 }
