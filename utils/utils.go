@@ -1,9 +1,9 @@
 package utils
 
-import {
+import (
 	"math/rand"
 	"time"
-}
+)
 
 func GenerateRandomUserCode(length int) string {
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
