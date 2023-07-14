@@ -12,4 +12,6 @@ func SkinsRoute(r f.Router) {
 
 func UserRoute(r f.Router) {
 	r.Get("/:user_code", c.GetUserSkins)
+	r.Post("/:user_code", c.UpdateUserSkins)
+	r.Post("/create", c.CreateUser)
 }
