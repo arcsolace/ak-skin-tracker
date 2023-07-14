@@ -15,3 +15,7 @@ func UserRoute(r f.Router) {
 	r.Post("/:user_code", c.UpdateUserSkins)
 	r.Post("/create", c.CreateUser)
 }
+
+func ShareRoute(r f.Router) {
+	r.Get("/:share_code", c.GetSharedSkins)
+}

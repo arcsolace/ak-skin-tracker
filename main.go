@@ -25,6 +25,7 @@ func setupRoutes(app *f.App) {
 
     r.SkinsRoute(api.Group("/skin"))
 	r.UserRoute(api.Group("/user"))
+	r.ShareRoute(api.Group("/share"))
 }
 
 func main() {
